@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  gateway:
+    build: ./gateway
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./gateway/.env
+    depends_on:
+      - redis
+    networks:
+      - telehealth-network
+    restart: unless-stopped
+
+  # Redis for rate limiting and caching
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - telehealth-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Authentication Service
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./auth-service/.env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - telehealth-network
+    restart: unless-stopped
+
+  # Patient Service (placeholder)
+  patient-service:
+    image: python:3.11-slim
+    command: echo "Patient Service placeholder - will be implemented later"
+    networks:
+      - telehealth-network
+
+  # Appointment Service (placeholder)
+  appointment-service:
+    image: python:3.11-slim
+    command: echo "Appointment Service placeholder - will be implemented later"
+    networks:
+      - telehealth-network
+
+  # Exercise Service (placeholder)
+  exercise-service:
+    image: python:3.11-slim
+    command: echo "Exercise Service placeholder - will be implemented later"
+    networks:
+      - telehealth-network
+
+  # Progress Service (placeholder)
+  progress-service:
+    image: python:3.11-slim
+    command: echo "Progress Service placeholder - will be implemented later"
+    networks:
+      - telehealth-network
+
+  # Communication Service (placeholder)
+  communication-service:
+    image: python:3.11-slim
+    command: echo "Communication Service placeholder - will be implemented later"
+    networks:
+      - telehealth-network
+
+  # File Service (placeholder)
+  file-service:
+    image: python:3.11-slim
+    command: echo "File Service placeholder - will be implemented later"
+    networks:
+      - telehealth-network
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: telehealth_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - telehealth-network
+    restart: unless-stopped
+
+networks:
+  telehealth-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  postgres-data:
