@@ -123,13 +123,73 @@ TeleHealth/
 ## Implementation Status
 
 - ✅ API Gateway
-- 🔄 Authentication Service (In Progress)
-- 🔄 Patient Service (In Progress)
+- ✅ Authentication Service
+- ✅ Patient Service
 - 📝 Appointment Service (Planned)
 - 📝 Exercise Service (Planned)
 - 📝 Progress Service (Planned)
 - 📝 Communication Service (Planned)
 - 📝 File Service (Planned)
+
+## Development
+
+We've added comprehensive development guides to help you get started:
+
+- **[DEVELOPMENT.md](./DEVELOPMENT.md)**: Detailed instructions for setting up your development environment
+- **[HOW_TO_RUN.md](./HOW_TO_RUN.md)**: Step-by-step guide for running the application
+- **[DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)**: Solutions for common Docker issues
+
+### Quick Start
+
+The easiest way to run the application is to use our interactive scripts:
+
+#### Option 1: Docker-based Setup
+
+- **Windows**: Run `.\run-app.ps1` in PowerShell
+- **macOS/Linux**: Run `./run-app.sh` in Terminal (you may need to make it executable first with `chmod +x run-app.sh`)
+
+These scripts will:
+1. Check if Docker is running
+2. Create necessary environment files
+3. Guide you through running the application using either Docker or local development
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd teleHealth
+
+# Run the interactive script
+.\run-app.ps1  # Windows
+./run-app.sh   # macOS/Linux
+
+# Or manually:
+docker-compose -f docker-compose.modified.yml up -d
+```
+
+#### Option 2: Local Development (Recommended)
+
+If you're experiencing Docker issues, use our local development scripts:
+
+- **Windows**: Run `.\run-local.ps1` in PowerShell
+- **macOS/Linux**: Run `./run-local.sh` in Terminal (you may need to make it executable first with `chmod +x run-local.sh`)
+
+These scripts will:
+1. Create a Python virtual environment
+2. Install all required dependencies
+3. Check if PostgreSQL and Redis are installed
+4. Guide you through running each service
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd teleHealth
+
+# Run the local development script
+.\run-local.ps1  # Windows
+./run-local.sh   # macOS/Linux
+```
+
+For detailed instructions, see [HOW_TO_RUN.md](./HOW_TO_RUN.md).
 
 ## Compliance and Security
 

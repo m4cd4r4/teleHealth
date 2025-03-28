@@ -54,41 +54,6 @@ services:
       - telehealth-network
     restart: unless-stopped
 
-  # Appointment Service (placeholder)
-  appointment-service:
-    image: python:3.11-slim
-    command: echo "Appointment Service placeholder - will be implemented later"
-    networks:
-      - telehealth-network
-
-  # Exercise Service (placeholder)
-  exercise-service:
-    image: python:3.11-slim
-    command: echo "Exercise Service placeholder - will be implemented later"
-    networks:
-      - telehealth-network
-
-  # Progress Service (placeholder)
-  progress-service:
-    image: python:3.11-slim
-    command: echo "Progress Service placeholder - will be implemented later"
-    networks:
-      - telehealth-network
-
-  # Communication Service (placeholder)
-  communication-service:
-    image: python:3.11-slim
-    command: echo "Communication Service placeholder - will be implemented later"
-    networks:
-      - telehealth-network
-
-  # File Service (placeholder)
-  file-service:
-    image: python:3.11-slim
-    command: echo "File Service placeholder - will be implemented later"
-    networks:
-      - telehealth-network
-
   # PostgreSQL Database
   db:
     image: postgres:15-alpine
