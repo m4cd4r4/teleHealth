@@ -55,12 +55,74 @@ TeleHealth utilizes a modern microservices architecture deployed with Docker and
 - **Docker Compose** for multi-container orchestration
 - **Nginx** for web serving and reverse proxy
 
+## Implementation Status
+
+### Current Services
+- ✅ **API Gateway** - Fully implemented with routing, authentication, and rate limiting
+- ✅ **Authentication Service** - Complete with user registration, login, JWT token management
+- ✅ **Patient Service** - Fully functional with patient profiles and medical records
+- 🚧 **Appointment Service** - Basic structure created, implementation in progress
+- 🚧 **Exercise Service** - Basic structure created, implementation in progress
+- 🚧 **Progress Service** - Basic structure created, implementation in progress
+- 🚧 **Communication Service** - Basic structure created, implementation in progress
+- 🚧 **File Service** - Basic structure created, implementation in progress
+
+### Current System Capabilities
+- User authentication and authorization
+- Patient profile management
+- Medical record storage and retrieval
+- API documentation via Swagger UI
+- Rate limiting and security features
+
+## Implemented Services
+
+### API Gateway
+The API Gateway serves as the entry point for all client requests, handling:
+- Request routing to appropriate microservices
+- Authentication and authorization via JWT
+- Rate limiting to prevent abuse
+- Request/response logging
+- API documentation via Swagger UI
+
+**Key Endpoints:**
+- `/api/v1/auth/*` - Routes to Authentication Service
+- `/api/v1/patients/*` - Routes to Patient Service
+- `/docs` - Interactive API documentation
+
+### Authentication Service
+The Authentication Service manages user identity and access:
+- User registration and account management
+- Secure password handling with bcrypt
+- JWT token generation and validation
+- Role-based access control
+
+**Key Endpoints:**
+- `POST /api/v1/auth/register` - Create new user account
+- `POST /api/v1/auth/login` - Authenticate and receive JWT
+- `GET /api/v1/auth/me` - Get current user profile
+- `POST /api/v1/auth/refresh` - Refresh JWT token
+
+### Patient Service
+The Patient Service manages patient data and medical records:
+- Patient profile creation and management
+- Medical history tracking
+- Allergy and medication management
+- Practitioner assignment
+
+**Key Endpoints:**
+- `GET /api/v1/patients` - List patients (for practitioners)
+- `GET /api/v1/patients/{id}` - Get patient details
+- `POST /api/v1/patients` - Create new patient record
+- `PUT /api/v1/patients/{id}` - Update patient information
+- `GET /api/v1/patients/{id}/medical-records` - Get patient medical records
+
 ## Getting Started
 
 ### Prerequisites
-- Docker and Docker Compose
-- Node.js v18 or higher (for local development)
-- Python 3.11 or higher (for local development)
+- Docker and Docker Compose (for Docker deployment)
+- Python 3.11+ (for local development)
+- PostgreSQL (for local development)
+- Redis (for local development)
 
 ### Installation and Setup
 
@@ -74,62 +136,23 @@ cd TeleHealth
 ```bash
 # For the API Gateway
 cp gateway/.env.example gateway/.env
-# Edit the .env file with your configuration
+# For the Auth Service
+cp auth-service/.env.example auth-service/.env
+# For the Patient Service
+cp patient-service/.env.example patient-service/.env
+# Edit the .env files with your configuration
 ```
 
 3. Start the application using Docker Compose
 ```bash
-docker-compose up -d
+docker-compose -f docker-compose.modified.yml up -d
 ```
 
 4. Access the application
 - API Gateway: http://localhost:8000
 - API Documentation: http://localhost:8000/docs
-
-## Development Setup
-
-For local development without Docker:
-
-1. Set up the API Gateway
-```bash
-cd gateway
-pip install -r requirements.txt
-uvicorn src.main:app --reload --port 8000
-```
-
-2. Set up other services as they are implemented
-```bash
-# For each service directory
-cd service-name
-pip install -r requirements.txt
-uvicorn src.main:app --reload --port PORT_NUMBER
-```
-
-## Project Structure
-
-```
-TeleHealth/
-├── gateway/                       # API Gateway
-├── appointment-service/           # Appointment management
-├── patient-service/               # Patient records and management
-├── exercise-service/              # Exercise prescription and library
-├── progress-service/              # Progress tracking and analysis
-├── communication-service/         # Video consultations and messaging
-├── file-service/                  # File storage and management
-├── scripts/                       # Utility scripts
-└── docker-compose.yml             # Docker deployment configuration
-```
-
-## Implementation Status
-
-- ✅ API Gateway
-- ✅ Authentication Service
-- ✅ Patient Service
-- 📝 Appointment Service (Planned)
-- 📝 Exercise Service (Planned)
-- 📝 Progress Service (Planned)
-- 📝 Communication Service (Planned)
-- 📝 File Service (Planned)
+- Auth Service: http://localhost:8001
+- Patient Service: http://localhost:8002
 
 ## Development
 
@@ -139,11 +162,7 @@ We've added comprehensive development guides to help you get started:
 - **[HOW_TO_RUN.md](./HOW_TO_RUN.md)**: Step-by-step guide for running the application
 - **[DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)**: Solutions for common Docker issues
 
-### Quick Start
-
-The easiest way to run the application is to use our interactive scripts:
-
-#### Option 1: Docker-based Setup
+### Option 1: Docker-based Setup
 
 - **Windows**: Run `.\run-app.ps1` in PowerShell
 - **macOS/Linux**: Run `./run-app.sh` in Terminal (you may need to make it executable first with `chmod +x run-app.sh`)
@@ -166,7 +185,7 @@ cd teleHealth
 docker-compose -f docker-compose.modified.yml up -d
 ```
 
-#### Option 2: Local Development (Recommended)
+### Option 2: Local Development
 
 If you're experiencing Docker issues, use our local development scripts:
 
@@ -190,6 +209,35 @@ cd teleHealth
 ```
 
 For detailed instructions, see [HOW_TO_RUN.md](./HOW_TO_RUN.md).
+
+## Development Roadmap
+
+### Next Phase (Q2 2025)
+1. **Appointment Service** - Priority: High
+   - Appointment scheduling and management
+   - Calendar integration
+   - Notifications and reminders
+
+2. **Exercise Service** - Priority: High
+   - Exercise library with video demonstrations
+   - Custom exercise program creation
+   - Exercise tracking and feedback
+
+### Future Phases (Q3-Q4 2025)
+3. **Progress Service** - Priority: Medium
+   - Patient progress tracking
+   - Analytics and reporting
+   - Goal setting and achievement tracking
+
+4. **Communication Service** - Priority: Medium
+   - Secure video consultations
+   - Real-time chat
+   - Messaging and notifications
+
+5. **File Service** - Priority: Low
+   - Secure file storage
+   - Media management
+   - Document sharing
 
 ## Compliance and Security
 
