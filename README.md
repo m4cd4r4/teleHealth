@@ -201,23 +201,6 @@ This platform is designed with healthcare compliance in mind:
 - Role-based access control
 - Comprehensive audit logging
 
-## Roadmap
-
-Future enhancements planned for TeleHealth:
-
-- **Mobile Application**: Native iOS and Android apps for enhanced mobile experience
-- **AI-Powered Movement Analysis**: Real-time form correction and movement assessment
-- **Wearable Integration**: Connect with fitness trackers and specialized rehabilitation devices
-- **Group Therapy**: Support for group rehabilitation sessions
-- **Internationalization**: Multi-language support for global deployment
-
-## Contributing
-
-Contributions are welcome! Please check out our contributing guidelines for details on how to get started with development, our coding standards, and the pull request process.
-
-## License
-
-This project is licensed under the MIT License.
 
 ## Acknowledgements
 
