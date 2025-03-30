@@ -54,6 +54,21 @@ services:
       - telehealth-network
     restart: unless-stopped
 
+  # Appointment Service
+  appointment-service:
+    build: ./appointment-service
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./appointment-service/.env
+    depends_on:
+      - db
+      - auth-service
+      - patient-service
+    networks:
+      - telehealth-network
+    restart: unless-stopped
+
   # PostgreSQL Database
   db:
     image: postgres:15-alpine
