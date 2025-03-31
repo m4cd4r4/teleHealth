@@ -69,6 +69,21 @@ services:
       - telehealth-network
     restart: unless-stopped
 
+  # Exercise Service
+  exercise-service:
+    build: ./exercise-service
+    ports:
+      - "8004:8003" # Map host 8004 to container 8003
+    env_file:
+      - ./exercise-service/.env
+    depends_on:
+      - db
+      - auth-service # Assuming it might need auth later
+      # Add other dependencies if needed (e.g., file-service)
+    networks:
+      - telehealth-network
+    restart: unless-stopped
+
   # PostgreSQL Database
   db:
     image: postgres:15-alpine
