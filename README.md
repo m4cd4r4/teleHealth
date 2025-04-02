@@ -223,7 +223,7 @@ For detailed instructions, see [HOW_TO_RUN.md](./HOW_TO_RUN.md).
    - Custom exercise program creation
    - Exercise tracking and feedback
 
-### Future Phases (Q3-Q4 2025)
+### Future Phases (Q2 2025)
 3. **Progress Service** - Priority: Medium
    - Patient progress tracking
    - Analytics and reporting
