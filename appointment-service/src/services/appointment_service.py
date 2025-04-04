@@ -26,11 +26,35 @@ class AppointmentService:
 
     async def create_appointment(self, appointment_data: AppointmentCreate) -> Appointment:
         """Creates a new appointment."""
-        logger.info(f"Attempting to create appointment for patient {appointment_data.patient_id} with practitioner {appointment_data.practitioner_id}")
+        logger.info(f"Attempting to create appointment for patient {appointment_data.patient_id} with practitioner {appointment_data.practitioner_id} at {appointment_data.start_time}")
 
-        # TODO: Add validation logic here (e.g., check practitioner availability, prevent double booking)
-        # This might involve calling get_practitioner_availability or querying existing appointments
+        # --- Validation ---
+        # 1. Check if start_time is before end_time
+        if appointment_data.start_time >= appointment_data.end_time:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Appointment start time must be before end time.")
 
+        # 2. Check if the requested slot is available and doesn't conflict
+        # Query existing appointments for the practitioner that overlap with the requested time
+        conflict_query = select(Appointment).where(
+            Appointment.practitioner_id == appointment_data.practitioner_id,
+            Appointment.status.in_([AppointmentStatus.SCHEDULED, AppointmentStatus.CONFIRMED, AppointmentStatus.RESCHEDULED]),
+            Appointment.start_time < appointment_data.end_time, # Existing starts before new ends
+            Appointment.end_time > appointment_data.start_time  # Existing ends after new starts
+        )
+        conflict_result = await self.db.execute(conflict_query)
+        conflicting_appointment = conflict_result.scalars().first()
+
+        if conflicting_appointment:
+            logger.warning(f"Booking conflict detected for practitioner {appointment_data.practitioner_id} at {appointment_data.start_time}. Conflicts with appointment ID {conflicting_appointment.id}")
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, 
+                detail=f"Time slot conflicts with an existing appointment (ID: {conflicting_appointment.id})."
+            )
+            
+        # TODO: Optionally, add a check against the practitioner's schedule using logic similar to get_practitioner_availability
+        # This would prevent booking outside working hours, even if there's no direct conflict.
+
+        # --- Creation ---
         # Create Appointment model instance from the schema data
         db_appointment = Appointment(
             patient_id=appointment_data.patient_id,
@@ -206,14 +230,32 @@ class AppointmentService:
         if not db_appointment:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Appointment with ID {appointment_id} not found")
 
-        # TODO: Implement availability check for the new time slot
-        # This should ideally call get_practitioner_availability or similar logic
-        # For now, we proceed assuming the time is valid
-
-        # Validate new times
+        # --- Validation ---
+        # 1. Validate new times
         if new_start_time >= new_end_time:
-             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New start time must be before new end time")
+             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New start time must be before new end time.")
 
+        # 2. Check for conflicts with other appointments at the new time
+        conflict_query = select(Appointment).where(
+            Appointment.id != appointment_id, # Exclude the current appointment
+            Appointment.practitioner_id == db_appointment.practitioner_id,
+            Appointment.status.in_([AppointmentStatus.SCHEDULED, AppointmentStatus.CONFIRMED, AppointmentStatus.RESCHEDULED]),
+            Appointment.start_time < new_end_time, # Existing starts before new ends
+            Appointment.end_time > new_start_time  # Existing ends after new starts
+        )
+        conflict_result = await self.db.execute(conflict_query)
+        conflicting_appointment = conflict_result.scalars().first()
+
+        if conflicting_appointment:
+            logger.warning(f"Reschedule conflict detected for appointment {appointment_id} at {new_start_time}. Conflicts with appointment ID {conflicting_appointment.id}")
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, 
+                detail=f"Requested reschedule time conflicts with another appointment (ID: {conflicting_appointment.id})."
+            )
+
+        # TODO: Optionally, add a check against the practitioner's schedule for the new time slot.
+
+        # --- Update ---
         # Update appointment details
         db_appointment.start_time = new_start_time
         db_appointment.end_time = new_end_time
@@ -433,8 +475,9 @@ class AppointmentService:
                                 })
                         
                         # Move to the next potential slot start time
-                        # TODO: Consider adding a buffer/step (e.g., 15 mins) instead of just duration
-                        potential_start += appointment_duration 
+                        # Use a smaller step (e.g., 15 minutes) for finer granularity
+                        step_duration = timedelta(minutes=15) 
+                        potential_start += step_duration
 
                 current_date += timedelta(days=1)
 

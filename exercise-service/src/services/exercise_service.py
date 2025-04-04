@@ -7,6 +7,7 @@ import logging
 
 from ..database import get_db
 from ..models.exercise import Exercise, DifficultyLevel
+from ..models.program import ProgramExercise # Import the association model
 from ..schemas.exercise import ExerciseCreate, ExerciseUpdate
 
 # Configure logging
@@ -146,9 +147,19 @@ class ExerciseService:
         if not db_exercise:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Exercise with ID {exercise_id} not found")
             
-        # TODO: Add check here - should we prevent deletion if exercise is used in programs?
-        # if db_exercise.program_associations:
-        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete exercise used in existing programs")
+        # Check if the exercise is used in any programs
+        # We need to explicitly load the relationship if it wasn't loaded by get_exercise
+        # A simple count query is more efficient than loading all associations
+        assoc_count_query = select(func.count()).select_from(ProgramExercise).where(ProgramExercise.exercise_id == exercise_id)
+        assoc_count_result = await self.db.execute(assoc_count_query)
+        assoc_count = assoc_count_result.scalar_one()
+
+        if assoc_count > 0:
+            logger.warning(f"Attempted to delete exercise {exercise_id} which is used in {assoc_count} program(s).")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail=f"Cannot delete exercise: It is currently used in {assoc_count} program(s)."
+            )
 
         try:
             await self.db.delete(db_exercise)
